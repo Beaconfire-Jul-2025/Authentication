@@ -10,18 +10,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 
 import javax.crypto.SecretKey;
-
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class JwtTokenProviderTest {
 
-    private JwtTokenProvider jwtTokenProvider;
     private final String testJwtSecret = "NiXTYNwyutkwyp34w3TYjb297yYUZCaCmr3YhDdT0W4=";
+    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     public void setUp() {

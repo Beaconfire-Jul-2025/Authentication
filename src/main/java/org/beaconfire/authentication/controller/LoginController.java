@@ -14,7 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +47,7 @@ public class LoginController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = tokenProvider.generateToken(authentication);
 
-            User user = (User) authentication.getPrincipal();
+            UserDetails user = (UserDetails) authentication.getPrincipal();
             UserResponse userResponse = UserResponse.builder()
                     .username(user.getUsername())
                     .role(user.getAuthorities().iterator().next().getAuthority().equals("ROLE_ADMIN") ? "ADMIN" : "USER")

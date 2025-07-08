@@ -18,12 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
+    private static final String DEFAULT_ROLE_NAME = "ROLE_EMPLOYEE";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
-
-    private static final String DEFAULT_ROLE_NAME = "ROLE_EMPLOYEE";
 
     @Transactional
     public void registerUser(UserRegistration registration) throws UserAlreadyExistsException {
