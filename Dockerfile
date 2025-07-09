@@ -14,6 +14,5 @@ RUN mvn -P dockerfile --batch-mode --fail-fast package
 FROM amazoncorretto:8-alpine-jdk AS runtime
 WORKDIR /app
 COPY --from=build /build/target/application.jar /app/application.jar
-EXPOSE 8081
 ENTRYPOINT ["java"]
 CMD ["-jar", "/app/application.jar"]
