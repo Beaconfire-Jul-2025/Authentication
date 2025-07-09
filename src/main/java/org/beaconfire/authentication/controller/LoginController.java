@@ -50,7 +50,7 @@ public class LoginController {
             UserDetails user = (UserDetails) authentication.getPrincipal();
             UserResponse userResponse = UserResponse.builder()
                     .username(user.getUsername())
-                    .role(user.getAuthorities().iterator().next().getAuthority().equals("ROLE_ADMIN") ? "ADMIN" : "USER")
+                    .role(user.getAuthorities().iterator().next().getAuthority())
                     .build();
 
             AuthResponse response = AuthResponse.builder().token(jwt).user(userResponse).build();
