@@ -52,4 +52,8 @@ public class RegistrationToken {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CreateBy", foreignKey = @ForeignKey(name = "FK_RegistrationToken_User"))
     private User createdBy;
+
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(expirationDate);
+    }
 }
