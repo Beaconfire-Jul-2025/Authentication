@@ -2,7 +2,8 @@ package org.beaconfire.authentication.controller;
 
 import lombok.AllArgsConstructor;
 import org.beaconfire.authentication.dto.user.UserRegistration;
-import org.beaconfire.authentication.exception.UserAlreadyExistsException;
+import org.beaconfire.authentication.dto.response.RegistrationResponse;
+import org.beaconfire.authentication.service.RegistrationTokenService;
 import org.beaconfire.authentication.model.RegistrationToken;
 import org.beaconfire.authentication.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
