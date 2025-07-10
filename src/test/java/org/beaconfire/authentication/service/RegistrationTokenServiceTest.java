@@ -42,8 +42,17 @@ class RegistrationTokenServiceTest {
         when(userRepository.findByUsername(hrUsername)).thenReturn(Optional.of(hrUser));
         when(tokenRepository.findValidTokenByEmail(eq(email), any(LocalDateTime.class)))
                 .thenReturn(Optional.empty());
-        when(tokenRepository.save(any(RegistrationToken.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Create a mock saved token to return
+        RegistrationToken savedToken = RegistrationToken.builder()
+                .id(1)
+                .token("generated-token")
+                .email(email)
+                .expirationDate(LocalDateTime.now().plusHours(3))
+                .createdBy(hrUser)
+                .build();
+
+        when(tokenRepository.save(any(RegistrationToken.class))).thenReturn(savedToken);
 
         // When
         RegistrationToken result = registrationTokenService.generateToken(email, hrUsername);
@@ -51,7 +60,31 @@ class RegistrationTokenServiceTest {
         // Then
         assertThat(result.getEmail()).isEqualTo(email);
         assertThat(result.getToken()).isNotNull();
+        assertThat(result.getCreatedBy()).isEqualTo(hrUser);
+
+        // Verify interactions
+        verify(userRepository).findByUsername(hrUsername);
+        verify(tokenRepository).findValidTokenByEmail(eq(email), any(LocalDateTime.class));
         verify(tokenRepository).save(any(RegistrationToken.class));
+    }
+
+    @Test
+    void testGenerateToken_UserNotFound() {
+        // Given
+        String email = "test@company.com";
+        String hrUsername = "hr_user";
+
+        when(userRepository.findByUsername(hrUsername)).thenReturn(Optional.empty());
+
+        // When & Then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> registrationTokenService.generateToken(email, hrUsername));
+
+        assertThat(exception.getMessage()).contains("HR user not found: " + hrUsername);
+
+        verify(userRepository).findByUsername(hrUsername);
+        verify(tokenRepository, never()).findValidTokenByEmail(anyString(), any(LocalDateTime.class));
+        verify(tokenRepository, never()).save(any(RegistrationToken.class));
     }
 
     @Test
@@ -60,15 +93,29 @@ class RegistrationTokenServiceTest {
         String email = "test@company.com";
         String hrUsername = "hr_user";
         User hrUser = User.builder().id(1).username(hrUsername).build();
-        RegistrationToken existingToken = RegistrationToken.builder().build();
 
         when(userRepository.findByUsername(hrUsername)).thenReturn(Optional.of(hrUser));
+
+        // Mock: existing valid token found
+        RegistrationToken existingToken = RegistrationToken.builder()
+                .id(1)
+                .token("existing-token")
+                .email(email)
+                .expirationDate(LocalDateTime.now().plusHours(2))
+                .createdBy(hrUser)
+                .build();
+
         when(tokenRepository.findValidTokenByEmail(eq(email), any(LocalDateTime.class)))
                 .thenReturn(Optional.of(existingToken));
 
         // When & Then
-        assertThrows(TokenAlreadyExistsException.class,
+        TokenAlreadyExistsException exception = assertThrows(TokenAlreadyExistsException.class,
                 () -> registrationTokenService.generateToken(email, hrUsername));
+
+        assertThat(exception.getMessage()).contains("A token for this email already exists and is valid.");
+
+        // Verify that save was never called
+        verify(tokenRepository, never()).save(any(RegistrationToken.class));
     }
 
     @Test
@@ -87,6 +134,7 @@ class RegistrationTokenServiceTest {
 
         // Then
         assertThat(result).isEqualTo(token);
+        verify(tokenRepository).findByToken(tokenValue);
     }
 
 
@@ -101,7 +149,10 @@ class RegistrationTokenServiceTest {
         when(tokenRepository.findByToken("expired")).thenReturn(Optional.of(expiredToken));
 
         // When & Then
-        assertThrows(TokenExpiredException.class,
+        TokenExpiredException exception = assertThrows(TokenExpiredException.class,
                 () -> registrationTokenService.validateToken("expired"));
+
+        assertThat(exception.getMessage()).contains("Token is expired at " + expiredToken.getExpirationDate());
+        verify(tokenRepository).findByToken("expired");
     }
 }

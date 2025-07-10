@@ -3,6 +3,7 @@ package org.beaconfire.authentication.service;
 import org.beaconfire.authentication.exception.TokenAlreadyExistsException;
 import org.beaconfire.authentication.exception.TokenExpiredException;
 import org.beaconfire.authentication.exception.TokenNotFoundException;
+import org.beaconfire.authentication.exception.UserNotFoundException;
 import org.beaconfire.authentication.model.RegistrationToken;
 import org.beaconfire.authentication.model.User;
 import org.beaconfire.authentication.repository.RegistrationTokenRepository;
@@ -33,7 +34,7 @@ public class RegistrationTokenService {
 
         // Find which HR created the token
         User hrUser = userRepository.findByUsername(createdByName)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + createdByName));
+                .orElseThrow(() -> new UserNotFoundException("HR user not found with username: " + createdByName));
 
         // Check if a token for this email already exists and is valid
         Optional<RegistrationToken> existingToken = registrationTokenRepository.findByEmail(email);
