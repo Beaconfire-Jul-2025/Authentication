@@ -3,16 +3,21 @@ package org.beaconfire.authentication.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.beaconfire.authentication.dto.user.UserRegistration;
+import org.beaconfire.authentication.exception.InvalidTokenException;
 import org.beaconfire.authentication.exception.UserAlreadyExistsException;
+import org.beaconfire.authentication.model.RegistrationToken;
 import org.beaconfire.authentication.model.Role;
 import org.beaconfire.authentication.model.User;
 import org.beaconfire.authentication.model.UserRole;
+import org.beaconfire.authentication.repository.RegistrationTokenRepository;
 import org.beaconfire.authentication.repository.RoleRepository;
 import org.beaconfire.authentication.repository.UserRepository;
 import org.beaconfire.authentication.repository.UserRoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -23,9 +28,17 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RegistrationTokenRepository registrationTokenRepository;
 
     @Transactional
     public void registerUser(UserRegistration registration) throws UserAlreadyExistsException {
+        //verify the token exist or not
+        RegistrationToken regToken = registrationTokenRepository.findByToken(registration.getToken())
+                .orElseThrow(() -> new InvalidTokenException("Invalid or missing token."));
+        //check expiration
+        if (regToken.getExpirationDate().isBefore(LocalDateTime.now())) {
+            throw new InvalidTokenException("Token has expired.");
+        }
         if (userRepository.existsByUsername(registration.getUsername())) {
             log.warn("Registration attempt with existing username: {}", registration.getUsername());
             throw new UserAlreadyExistsException(
@@ -50,8 +63,11 @@ public class UserService {
 
         // Assign default role to the user
         assignDefaultRoleToUser(savedUser);
-
         log.info("User {} registered successfully with default role.", registration.getUsername());
+
+        regToken.setExpirationDate(LocalDateTime.now());
+        registrationTokenRepository.save(regToken);
+        log.info("Token {} marked as used.", regToken.getToken());
     }
 
     /**
@@ -82,4 +98,5 @@ public class UserService {
         userRoleRepository.save(userRole);
         log.info("Assigned role '{}' to user '{}'", DEFAULT_ROLE_NAME, user.getUsername());
     }
+
 }

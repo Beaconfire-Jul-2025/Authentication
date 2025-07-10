@@ -27,4 +27,6 @@ public class UserRegistration {
     @Email(message = "Email should be valid")
     @Size(max = 255, message = "Email must not exceed 255 characters")
     private String email;
+    @NotBlank(message = "Token cannot be empty")
+    private String token;
 }
