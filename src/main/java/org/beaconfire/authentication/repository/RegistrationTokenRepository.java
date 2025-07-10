@@ -31,6 +31,9 @@ public interface RegistrationTokenRepository extends JpaRepository<RegistrationT
     Optional<RegistrationToken> findValidTokenByToken(@Param("token") String token,
                                                       @Param("currentDate") LocalDateTime currentDate);
 
+    @Query("SELECT rt FROM RegistrationToken rt WHERE rt.email = :email AND rt.expirationDate > :currentTime")
+    Optional<RegistrationToken> findValidTokenByEmail(@Param("email") String email, @Param("currentTime") LocalDateTime currentTime);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM RegistrationToken rt WHERE rt.expirationDate <= :currentDate")
