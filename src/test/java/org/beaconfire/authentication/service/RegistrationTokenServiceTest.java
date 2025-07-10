@@ -2,6 +2,7 @@ package org.beaconfire.authentication.service;
 
 import org.beaconfire.authentication.exception.TokenAlreadyExistsException;
 import org.beaconfire.authentication.exception.TokenExpiredException;
+import org.beaconfire.authentication.exception.UserNotFoundException;
 import org.beaconfire.authentication.model.RegistrationToken;
 import org.beaconfire.authentication.model.User;
 import org.beaconfire.authentication.repository.RegistrationTokenRepository;
@@ -40,8 +41,7 @@ class RegistrationTokenServiceTest {
         User hrUser = User.builder().id(1).username(hrUsername).build();
 
         when(userRepository.findByUsername(hrUsername)).thenReturn(Optional.of(hrUser));
-        when(tokenRepository.findValidTokenByEmail(eq(email), any(LocalDateTime.class)))
-                .thenReturn(Optional.empty());
+        when(tokenRepository.findByEmail(eq(email))).thenReturn(Optional.empty());
 
         // Create a mock saved token to return
         RegistrationToken savedToken = RegistrationToken.builder()
@@ -64,7 +64,7 @@ class RegistrationTokenServiceTest {
 
         // Verify interactions
         verify(userRepository).findByUsername(hrUsername);
-        verify(tokenRepository).findValidTokenByEmail(eq(email), any(LocalDateTime.class));
+        verify(tokenRepository).findByEmail(email);
         verify(tokenRepository).save(any(RegistrationToken.class));
     }
 
@@ -77,10 +77,10 @@ class RegistrationTokenServiceTest {
         when(userRepository.findByUsername(hrUsername)).thenReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
                 () -> registrationTokenService.generateToken(email, hrUsername));
 
-        assertThat(exception.getMessage()).contains("HR user not found: " + hrUsername);
+        assertThat(exception.getMessage()).contains("HR user not found with username: " + hrUsername);
 
         verify(userRepository).findByUsername(hrUsername);
         verify(tokenRepository, never()).findValidTokenByEmail(anyString(), any(LocalDateTime.class));
@@ -105,8 +105,7 @@ class RegistrationTokenServiceTest {
                 .createdBy(hrUser)
                 .build();
 
-        when(tokenRepository.findValidTokenByEmail(eq(email), any(LocalDateTime.class)))
-                .thenReturn(Optional.of(existingToken));
+        when(tokenRepository.findByEmail(email)).thenReturn(Optional.of(existingToken));
 
         // When & Then
         TokenAlreadyExistsException exception = assertThrows(TokenAlreadyExistsException.class,
