@@ -14,6 +14,8 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRegistration {
+    @NotBlank(message = "Token cannot be empty")
+    private String token;
 
     @NotBlank(message = "Username cannot be empty")
     @Size(min = 3, max = 255, message = "Username must be between 3 and 255 characters")
