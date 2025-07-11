@@ -41,9 +41,4 @@ public class RegistrationTokenController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(tokenResponse);
     }
-
-    @GetMapping("/auth/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("Test endpoint works!");
-    }
 }
