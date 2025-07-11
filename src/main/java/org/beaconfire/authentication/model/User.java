@@ -58,7 +58,7 @@ public class User {
     @Builder.Default
     private Boolean activeFlag = true;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
