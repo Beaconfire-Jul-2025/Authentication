@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/signup")
+@RequestMapping("/auth/register")
 @AllArgsConstructor
 public class RegistrationController {
 
