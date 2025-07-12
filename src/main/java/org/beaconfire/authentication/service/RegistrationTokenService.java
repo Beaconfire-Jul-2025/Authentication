@@ -21,14 +21,13 @@ public class RegistrationTokenService {
 
     private final RegistrationTokenRepository registrationTokenRepository;
     private final UserRepository userRepository;
+    @Value("${registration.token.expiration.hours}")
+    private int tokenExpirationHours;
 
     public RegistrationTokenService(RegistrationTokenRepository registrationTokenRepository, UserRepository userRepository) {
         this.registrationTokenRepository = registrationTokenRepository;
         this.userRepository = userRepository;
     }
-
-    @Value("${registration.token.expiration.hours}")
-    private int tokenExpirationHours;
 
     public RegistrationToken generateToken(String email, String createdByName) {
 

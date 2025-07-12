@@ -105,7 +105,7 @@ jobs:
             -p 3306:3306 \
             -e MYSQL_ROOT_PASSWORD=${{ env.SPRING_DATASOURCE_PASSWORD }} \
             -e MYSQL_DATABASE=AuthenticationService \
-            -v ${{ github.workspace }}/.mysql:/docker-entrypoint-initdb.d \
+            -v ${{ github.workspace }}/github-actions/mysql:/docker-entrypoint-initdb.d \
             mysql:lts
 
       - name: Wait for MySQL to be ready
@@ -135,9 +135,36 @@ jobs:
           curl -f http://localhost:8081/actuator/health || \
             (echo "Error: Spring Boot service not responding." && exit 1)
           echo "Spring Boot application is healthy."
-            
-          # Clean up: Terminate the Java process after verification
+
+      - name: Perform API Tests from Folder
+        env:
+          BASE_URL: http://localhost:8081
+        run: |
+          API_TESTS_DIR="github-actions/api-tests"
+
+          if [ -d "$API_TESTS_DIR" ]; then
+            echo "Executing API tests from $API_TESTS_DIR..."
+            find "$API_TESTS_DIR" -type f -name "*.sh" | sort | while read -r script; do
+              echo "--- Running API Test: $(basename "$script") ---"
+              chmod +x "$script" # Make sure the script is executable
+              "$script" # Execute the script
+              if [ $? -ne 0 ]; then # Check the exit code of the last command
+                echo "Error: API Test $(basename "$script") failed!"
+                exit 1 # Fail the GitHub Actions job
+              fi
+              echo "--- API Test $(basename "$script") completed successfully ---"
+            done
+            echo "All API tests completed."
+          else
+            echo "Warning: API tests directory '$API_TESTS_DIR' not found. Skipping API tests."
+          fi
+
+      - name: Clean up Spring Boot application
+        if: always()
+        run: |
+          echo "Terminating Spring Boot application..."
           pkill -f 'java -jar'
+
 
       - name: Stop MySQL Docker Container
         if: always()
