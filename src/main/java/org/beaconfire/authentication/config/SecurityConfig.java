@@ -34,10 +34,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                new AntPathRequestMatcher("/login"),
-                                new AntPathRequestMatcher("/auth/**")
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                                new AntPathRequestMatcher("/auth/token")
+                        ).authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf().disable()
