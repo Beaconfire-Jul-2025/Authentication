@@ -23,23 +23,22 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
     private Integer id;
 
-    @Column(name = "RoleName", nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = 100)
     @NotBlank(message = "Role name is required")
     @Size(max = 100, message = "Role name must not exceed 100 characters")
     private String roleName;
 
-    @Column(name = "RoleDescription", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String roleDescription;
 
     @CreationTimestamp
-    @Column(name = "CreateDate", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
     @UpdateTimestamp
-    @Column(name = "LastModificationDate", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime lastModificationDate;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

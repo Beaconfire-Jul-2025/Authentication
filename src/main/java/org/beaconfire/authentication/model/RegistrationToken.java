@@ -27,21 +27,20 @@ public class RegistrationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
     private Integer id;
 
-    @Column(name = "Token", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     @NotBlank(message = "Token is required")
     @Size(max = 255, message = "Token must not exceed 255 characters")
     private String token;
 
-    @Column(name = "Email", nullable = false)
+    @Column(nullable = false)
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     @Size(max = 255, message = "Email must not exceed 255 characters")
     private String email;
 
-    @Column(name = "ExpirationDate", nullable = false)
+    @Column(nullable = false)
     @NotNull(message = "Expiration date is required")
     private LocalDateTime expirationDate;
 
@@ -50,7 +49,7 @@ public class RegistrationToken {
     private LocalDateTime createDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CreateBy", foreignKey = @ForeignKey(name = "FK_RegistrationToken_User"))
+    @JoinColumn(foreignKey = @ForeignKey(name = "FK_RegistrationToken_User"))
     private User createdBy;
 
     public boolean isExpired() {
