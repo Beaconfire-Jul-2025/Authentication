@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "UserRole",
-        uniqueConstraints = @UniqueConstraint(name = "unique_user_role", columnNames = {"UserID", "RoleID"}),
+        uniqueConstraints = @UniqueConstraint(name = "unique_user_role", columnNames = {"userId", "roleId"}),
         indexes = {
-                @Index(name = "idx_user_id", columnList = "UserID"),
-                @Index(name = "idx_role_id", columnList = "RoleID")
+                @Index(name = "idx_user_id", columnList = "userId"),
+                @Index(name = "idx_role_id", columnList = "roleId")
         })
 @Data
 @NoArgsConstructor
@@ -22,28 +22,27 @@ public class UserRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID", nullable = false, foreignKey = @ForeignKey(name = "FK_UserRole_User"))
+    @JoinColumn(name = "userId", nullable = false, foreignKey = @ForeignKey(name = "FK_UserRole_User"))
     @ToString.Exclude
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "RoleID", nullable = false, foreignKey = @ForeignKey(name = "FK_UserRole_Role"))
+    @JoinColumn(name = "roleId", nullable = false, foreignKey = @ForeignKey(name = "FK_UserRole_Role"))
     private Role role;
 
-    @Column(name = "ActiveFlag", nullable = false)
+    @Column(nullable = false)
     @Builder.Default
     private Boolean activeFlag = true;
 
     @CreationTimestamp
-    @Column(name = "CreateDate", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
     @UpdateTimestamp
-    @Column(name = "LastModificationDate", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime lastModificationDate;
 
     /**

@@ -27,34 +27,33 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
     private Integer id;
 
-    @Column(name = "Username", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     @NotBlank(message = "Username is required")
     @Size(max = 255, message = "Username must not exceed 255 characters")
     private String username;
 
-    @Column(name = "Email", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     @Size(max = 255, message = "Email must not exceed 255 characters")
     private String email;
 
-    @Column(name = "Password", nullable = false)
+    @Column(nullable = false)
     @NotBlank(message = "Password is required")
     @Size(max = 255, message = "Password must not exceed 255 characters")
     private String password;
 
     @CreationTimestamp
-    @Column(name = "CreateDate", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
     @UpdateTimestamp
-    @Column(name = "LastModificationDate", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime lastModificationDate;
 
-    @Column(name = "ActiveFlag", nullable = false)
+    @Column(nullable = false)
     @Builder.Default
     private Boolean activeFlag = true;
 
