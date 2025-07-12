@@ -1,5 +1,6 @@
 package org.beaconfire.authentication.controller;
 
+import lombok.AllArgsConstructor;
 import org.beaconfire.authentication.dto.request.TokenGenerationRequest;
 import org.beaconfire.authentication.dto.response.TokenResponse;
 import org.beaconfire.authentication.model.RegistrationToken;
@@ -13,12 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
+@AllArgsConstructor
 public class RegistrationTokenController {
     private final RegistrationTokenService registrationTokenService;
-
-    public RegistrationTokenController(RegistrationTokenService registrationTokenService) {
-        this.registrationTokenService = registrationTokenService;
-    }
 
     @PostMapping("/auth/token")
     @PreAuthorize("hasRole('HR')")
