@@ -2,6 +2,7 @@ package org.beaconfire.authentication.controller;
 
 import org.beaconfire.authentication.dto.auth.AuthRequest;
 import org.beaconfire.authentication.dto.auth.AuthResponse;
+import org.beaconfire.authentication.repository.UserRepository;
 import org.beaconfire.authentication.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,11 +28,13 @@ class LoginControllerTest {
     private JwtTokenProvider tokenProvider;
     private LoginController loginController;
 
+    private UserRepository userRepository = mock(UserRepository.class);
+
     @BeforeEach
     void setUp() {
         authenticationManager = mock(AuthenticationManager.class);
         tokenProvider = mock(JwtTokenProvider.class);
-        loginController = new LoginController(authenticationManager, tokenProvider);
+        loginController = new LoginController(authenticationManager, tokenProvider, userRepository);
     }
 
     @Test

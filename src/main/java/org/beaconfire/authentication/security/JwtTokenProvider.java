@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 @Setter
@@ -69,5 +70,18 @@ public class JwtTokenProvider {
             log.error("Invalid JWT token: {}", e.getMessage());
         }
         return false;
+    }
+
+    public String generateTokenWithClaims(Map<String, Object> claims) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+        claims.putIfAbsent("iat", now.getTime() / 1000);
+        claims.putIfAbsent("exp", expiryDate.getTime() / 1000);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
     }
 }
