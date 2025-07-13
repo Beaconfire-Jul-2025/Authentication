@@ -41,17 +41,41 @@ class LoginControllerTest {
     void testAuthenticateUser_Success() {
         AuthRequest request = new AuthRequest("user1", "password123");
         Authentication auth = mock(Authentication.class);
-        User mockUser = new User("user1", "password123", Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+        org.springframework.security.core.userdetails.User mockUser =
+                new org.springframework.security.core.userdetails.User(
+                        "user1", "password123",
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
 
+        // Mock authentication
         when(authenticationManager.authenticate(any())).thenReturn(auth);
         when(auth.getPrincipal()).thenReturn(mockUser);
-        when(tokenProvider.generateToken(auth)).thenReturn("mock-jwt");
+
+        // Mock User entity and UserRepository
+        org.beaconfire.authentication.model.User entityUser = org.beaconfire.authentication.model.User.builder()
+                .id(1)
+                .username("user1")
+                .email("user1@email.com")
+                .password("password123")
+                .build();
+        org.beaconfire.authentication.model.Role role = new org.beaconfire.authentication.model.Role();
+        role.setRoleName("ROLE_USER");
+        org.beaconfire.authentication.model.UserRole userRole = new org.beaconfire.authentication.model.UserRole();
+        userRole.setRole(role);
+        userRole.setUser(entityUser);
+        entityUser.getUserRoles().add(userRole);
+        when(userRepository.findByUsername("user1")).thenReturn(java.util.Optional.of(entityUser));
+
+        // Mock token provider
+        when(tokenProvider.generateTokenWithClaims(any())).thenReturn("mock-jwt");
 
         ResponseEntity<?> response = loginController.authenticateUser(request);
 
         assertEquals(200, response.getStatusCodeValue());
         assertInstanceOf(AuthResponse.class, response.getBody());
-        assertEquals("mock-jwt", ((AuthResponse) response.getBody()).getToken());
+        AuthResponse authResponse = (AuthResponse) response.getBody();
+        assertEquals("mock-jwt", authResponse.getToken());
+        assertEquals("user1", authResponse.getUser().getUsername());
+        assertEquals("ROLE_USER", authResponse.getUser().getRole());
     }
 
     @Test
