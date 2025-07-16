@@ -53,7 +53,7 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime lastModificationDate;
 
-    @Column(nullable = false)
+    @Column(name = "activeFlag", nullable = false)
     @Builder.Default
     private Boolean activeFlag = true;
 
