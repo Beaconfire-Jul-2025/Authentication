@@ -1,6 +1,7 @@
 package org.beaconfire.authentication.config;
 
 import lombok.AllArgsConstructor;
+import org.beaconfire.authentication.security.AuthFilter;
 import org.beaconfire.authentication.security.JwtAuthenticationFilter;
 import org.beaconfire.authentication.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -27,19 +28,22 @@ public class SecurityConfig {
 
     private CustomUserDetailsService customUserDetailsService;
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private AuthFilter authFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
-                                new AntPathRequestMatcher("/auth/token")
-                        ).authenticated()
-                        .anyRequest().permitAll()
+                        .antMatchers("/login").permitAll()
+                        .antMatchers("/auth/register").permitAll()
+                        // shared key endpoints
+                        .antMatchers("/auth/token").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf().disable()
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
