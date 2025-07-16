@@ -25,7 +25,7 @@ public class JwtTokenProvider {
     private int jwtExpirationInMs;
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(this.jwtSecret);
+        byte[] keyBytes = Decoders.BASE64.decode (this.jwtSecret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -79,6 +79,7 @@ public class JwtTokenProvider {
         claims.putIfAbsent("exp", expiryDate.getTime() / 1000);
         return Jwts.builder()
                 .setClaims(claims)
+                .setSubject((String) claims.get("username"))
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey())

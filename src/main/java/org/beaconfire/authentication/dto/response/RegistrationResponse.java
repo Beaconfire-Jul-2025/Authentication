@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class RegistrationResponse {
     private boolean success;
     private String message;
-    private Integer userId;
     private String username;
     private String email;
 }

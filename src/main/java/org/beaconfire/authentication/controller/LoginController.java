@@ -69,11 +69,13 @@ public class LoginController {
             claims.put("username", user.getUsername());
             claims.put("email", user.getEmail());
             claims.put("roles", roles);
+            claims.put("isActive", user.getActiveFlag());
             // JWT with custom claims
             String jwt = tokenProvider.generateTokenWithClaims(claims);
             UserResponse userResponse = UserResponse.builder()
                     .username(user.getUsername())
                     .role(roles.stream().findFirst().orElse(""))
+                    .isActive(user.getActiveFlag())
                     .build();
             AuthResponse response = AuthResponse.builder().token(jwt).user(userResponse).build();
             return ResponseEntity.ok(response);
