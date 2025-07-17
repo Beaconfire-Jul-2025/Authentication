@@ -1,14 +1,13 @@
 package org.beaconfire.authentication.config;
 
 import lombok.AllArgsConstructor;
-import org.beaconfire.authentication.security.JwtAuthenticationFilter;
+import org.beaconfire.authentication.security.HeaderAuthenticationFilter;
 import org.beaconfire.authentication.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,12 +20,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @AllArgsConstructor
 public class SecurityConfig {
 
+    private final HeaderAuthenticationFilter headerAuthenticationFilter;
     private CustomUserDetailsService customUserDetailsService;
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,11 +34,15 @@ public class SecurityConfig {
                         .requestMatchers(
                                 new AntPathRequestMatcher("/auth/token")
                         ).authenticated()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/login"),
+                                new AntPathRequestMatcher("/register")
+                        ).permitAll()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf().disable()
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
