@@ -29,11 +29,11 @@ public class RegistrationTokenService {
         this.userRepository = userRepository;
     }
 
-    public RegistrationToken generateToken(String email, String createdByName) {
+    public RegistrationToken generateToken(String email, Integer userId) {
 
         // Find which HR created the token
-        User hrUser = userRepository.findByUsername(createdByName)
-                .orElseThrow(() -> new UserNotFoundException("HR user not found with username: " + createdByName));
+        User hrUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("HR user not found with username: " + userId));
 
         // Check if a token for this email already exists and is valid
         Optional<RegistrationToken> existingToken = registrationTokenRepository.findByEmail(email);
