@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
-    private static final String DEFAULT_ROLE_NAME = "ROLE_EMPLOYEE";
+    private static final String DEFAULT_ROLE_NAME = "ROLE_ONBOARDING";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;

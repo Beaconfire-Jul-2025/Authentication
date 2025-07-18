@@ -3,8 +3,6 @@ package org.beaconfire.authentication.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.beaconfire.authentication.dto.auth.AuthRequest;
-import org.beaconfire.authentication.dto.auth.AuthResponse;
-import org.beaconfire.authentication.dto.user.UserResponse;
 import org.beaconfire.authentication.model.User;
 import org.beaconfire.authentication.repository.UserRepository;
 import org.beaconfire.authentication.security.JwtTokenProvider;
@@ -71,12 +69,13 @@ public class LoginController {
             claims.put("roles", roles);
             // JWT with custom claims
             String jwt = tokenProvider.generateTokenWithClaims(claims);
-            UserResponse userResponse = UserResponse.builder()
-                    .username(user.getUsername())
-                    .role(roles.stream().findFirst().orElse(""))
-                    .build();
-            AuthResponse response = AuthResponse.builder().token(jwt).user(userResponse).build();
-            return ResponseEntity.ok(response);
+            // Build frontend response
+            Map<String, Object> frontendResponse = new HashMap<>();
+            frontendResponse.put("status", "ok");
+            frontendResponse.put("type", "account");
+            frontendResponse.put("currentAuthority", roles.stream().findFirst().orElse("hr"));
+            frontendResponse.put("token", jwt);
+            return ResponseEntity.ok(frontendResponse);
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Invalid username or password.");
