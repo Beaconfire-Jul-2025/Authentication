@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: authentication
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/AuthenticationService?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:mysecretpassword}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+server:
+  port: 9081
+app:
+  jwt:
+    secret: NiXTYNwyutkwyp34w3TYjb297yYUZCaCmr3YhDdT0W4=
+    expiration-in-ms: 86400000
+  originsUrl: ${FRONTEND_URL:http://localhost:8000}
+  composite:
+    secrets: ${COMPOSITE_SECRETS:test-secret-that-should-be-replaced}
+registration:
+  token:
+    expiration:
+      hours: 3
+springdoc:
+  api-docs:
+    path: /openapi/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    url: /openapi/api-docs
+
